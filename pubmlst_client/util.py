@@ -6,9 +6,11 @@ import urllib.request
 
 
 def get(api_url, headers={'Content-Type': 'application/json'}, max_retries=5):
+    proxy_host = 'webproxy.bfr.bund.de:8080'
     response = None
     retries = 0
     request = urllib.request.Request(api_url, headers=headers)
+    request.set_proxy(proxy_host, 'http')
     while retries < max_retries:
         time.sleep(1) # give the api a rest
         try:
@@ -31,11 +33,11 @@ def get(api_url, headers={'Content-Type': 'application/json'}, max_retries=5):
         return response_content
     elif response and response.status == 401:
         log_msg = {
-                'timestamp': str(datetime.datetime.now().isoformat()),
-                'event': 'connection_error',
-                'url': api_url,
-                'message': 'Unauthorized',
-            }
+            'timestamp': str(datetime.datetime.now().isoformat()),
+            'event': 'connection_error',
+            'url': api_url,
+            'message': 'Unauthorized',
+        }
         print(json.dumps(log_msg), file=sys.stderr)
         return None
     else:

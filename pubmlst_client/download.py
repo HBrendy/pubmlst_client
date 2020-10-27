@@ -7,6 +7,10 @@ import os
 import sys
 import time
 
+import io
+import requests
+import pandas as pd
+
 from pubmlst_client.util import get
 
 
@@ -32,7 +36,19 @@ def main():
     ])
 
     scheme_response = json.loads(get(scheme_url))
-    
+
+
+    proxy_dict = {"http": "http://webproxy.bfr.bund.de:8080",
+                  "https": "https://webproxy.bfr.bund.de:8080"}
+    s = requests.get(scheme_response['profiles_csv'], proxies=proxy_dict).text
+    pd.read_csv(io.StringIO(s), sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.scheme_name) + ".txt"), sep='\t', index=None)
+
+    try:
+        pd.read_csv(os.path.join(args.outdir, args.scheme_name + ".txt"))
+    except:
+        raise FileNotFoundError
+
+
     for locus_url in scheme_response['loci']:
         locus = json.loads(get(locus_url))
         plaintext_header = {'Content-Type': 'text/plain'}
