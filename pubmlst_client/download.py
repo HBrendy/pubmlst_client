@@ -47,7 +47,7 @@ def main():
         locus = json.loads(get(locus_url))
         plaintext_header = {'Content-Type': 'text/plain'}
         alleles_fasta = get(locus['alleles_fasta'], headers=plaintext_header).decode('utf-8')
-        output_filename = os.path.join(args.outdir, locus['id'] + '.fasta')
+        output_filename = os.path.join(args.outdir, locus['id'] + '.tfa')
         with open(output_filename, 'w') as f:
             f.write(alleles_fasta)
         log_msg = {
@@ -56,8 +56,7 @@ def main():
             'filename': output_filename,
         }
         print(json.dumps(log_msg), file=sys.stderr)
-            
-        
+
 
 if __name__ == '__main__':    
     main()
