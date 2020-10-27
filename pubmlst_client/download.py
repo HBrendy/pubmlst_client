@@ -41,13 +41,7 @@ def main():
     proxy_dict = {"http": "http://webproxy.bfr.bund.de:8080",
                   "https": "https://webproxy.bfr.bund.de:8080"}
     s = requests.get(scheme_response['profiles_csv'], proxies=proxy_dict).text
-    pd.read_csv(io.StringIO(s), sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.scheme_name) + ".txt"), sep='\t', index=None)
-
-    try:
-        pd.read_csv(os.path.join(args.outdir, args.scheme_name + ".txt"))
-    except:
-        raise FileNotFoundError
-
+    pd.read_csv(io.StringIO(s), sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.outdir) + ".txt"), sep='\t', index=None)
 
     for locus_url in scheme_response['loci']:
         locus = json.loads(get(locus_url))
