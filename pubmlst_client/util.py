@@ -5,12 +5,12 @@ import time
 import urllib.request
 
 
-def get(api_url, headers={'Content-Type': 'application/json'}, max_retries=5):
-    proxy_host = 'webproxy.bfr.bund.de:8080'
+def get(api_url, headers={'Content-Type': 'application/json'}, proxy: str='', max_retries=5):
     response = None
     retries = 0
     request = urllib.request.Request(api_url, headers=headers)
-    request.set_proxy(proxy_host, 'http')
+    if proxy != '':
+        request.set_proxy(proxy, 'http')
     while retries < max_retries:
         time.sleep(1) # give the api a rest
         try:

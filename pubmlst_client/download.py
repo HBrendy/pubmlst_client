@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--scheme_id", "-i", dest="scheme_id", default="1", help="scheme id")
     parser.add_argument("--outdir", "-o", dest="outdir", default='.', help="output directory")
     parser.add_argument("--base-url", "-b", dest="base_url", default='http://rest.pubmlst.org/db', help="Base URL for the API. Suggested values are: http://rest.pubmlst.org/db (default), https://bigsdb.pasteur.fr/api/db")
+    parser.add_argument("--proxy", "-p", dest="proxy", default='', help="Proxy URL: http://yourProxy:8080")
     args = parser.parse_args()
     
     if not os.path.exists(args.outdir):
@@ -35,13 +36,15 @@ def main():
         args.scheme_id
     ])
 
-    scheme_response = json.loads(get(scheme_url))
+    scheme_response = json.loads(get(api_url=scheme_url, proxy=args.proxy))
 
-
-    proxy_dict = {"http": "http://webproxy.bfr.bund.de:8080",
-                  "https": "https://webproxy.bfr.bund.de:8080"}
-    s = requests.get(scheme_response['profiles_csv'], proxies=proxy_dict).text
-    pd.read_csv(io.StringIO(s), sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.outdir) + ".txt"), sep='\t', index=None)
+    if args.proxy == '':
+        pd.read_csv(scheme_response['profiles_csv'], sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.outdir) + ".txt"), sep='\t', index=None)
+    else:
+        proxy_dict = {"http": args.proxy,
+                      "https": args.proxy}
+        s = requests.get(scheme_response['profiles_csv'], proxies=proxy_dict).text
+        pd.read_csv(io.StringIO(s), sep='\t', index_col=False).to_csv(os.path.join(args.outdir, os.path.basename(args.outdir) + ".txt"), sep='\t', index=None)
 
     for locus_url in scheme_response['loci']:
         locus = json.loads(get(locus_url))
